@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isaiah Time Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .clock-image {
+            width: 120px;
+            height: 120px;
+            margin: 20px auto;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .input-section {
+            margin: 30px 0;
+        }
+
+        label {
+            display: block;
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="number"] {
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            width: 80px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border-radius: 15px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .countdown {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin: 15px 0;
+        }
+
+        .excuse {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-style: italic;
+            color: #4a5568;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .excuse::before {
+            content: "💭 ";
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Isaiah Time Calculator</h1>
+        
+        <div class="clock-image">
+            ⏰
+        </div>
+        
+        <div class="input-section">
+            <label>¿En cuánto tiempo dijo Isaiah que estaría?</label>
+            <div class="input-group">
+                <input type="number" id="hours" placeholder="0" min="0" max="23">
+                <span>horas</span>
+                <input type="number" id="minutes" placeholder="10" min="0" max="59">
+                <span>minutos</span>
+                <button onclick="calculateRealTime()">Calcular Tiempo Real</button>
+            </div>
+        </div>
+        
+        <div id="result" class="result-section">
+            <h3>Tiempo Real de Espera:</h3>
+            <div id="countdown" class="countdown"></div>
+            <div id="excuse" class="excuse"></div>
+        </div>
+    </div>
+
+    <script>
+        const excuses = [
+            "llevar al chinijo a baile",
+            "Recoger mi cuarto",
+            "Ir a famara a surfear",
+            "Ir a papagayo",
+            "Me quedé dormido",
+            "Me estoy haciendo unos crepes",
+            "Me estoy haciendo un salchi",
+            "Ya casi estoy",
+            "Estoy en casa de la piba"
+        ];
+
+        let countdownInterval;
+
+        function calculateRealTime() {
+            const hours = parseInt(document.getElementById('hours').value) || 0;
+            const minutes = parseInt(document.getElementById('minutes').value) || 0;
+            
+            if (hours === 0 && minutes === 0) {
+                alert('Por favor, ingresa un tiempo válido');
+                return;
+            }
+
+            // Isaiah's time multiplier: between 2x and 4x the original time
+            const multiplier = Math.random() * 2 + 2; // 2 to 4
+            
+            const originalTimeInMinutes = (hours * 60) + minutes;
+            const realTimeInMinutes = Math.round(originalTimeInMinutes * multiplier);
+            
+            // Show random excuse
+            const randomExcuse = excuses[Math.floor(Math.random() * excuses.length)];
+            document.getElementById('excuse').textContent = `"${randomExcuse}"`;
+            
+            // Show result section
+            document.getElementById('result').classList.add('show');
+            
+            // Start countdown
+            startCountdown(realTimeInMinutes * 60); // Convert to seconds
+        }
+
+        function startCountdown(totalSeconds) {
+            // Clear any existing countdown
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            function updateCountdown() {
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+
+                let display = '';
+                if (hours > 0) {
+                    display += `${hours}h `;
+                }
+                display += `${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+
+                document.getElementById('countdown').textContent = display;
+
+                if (totalSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdown').textContent = "¡Isaiah debería estar aquí!";
+                    document.getElementById('countdown').style.color = "#ff6b6b";
+                    return;
+                }
+
+                totalSeconds--;
+            }
+
+            updateCountdown(); // Initial call
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        // Allow Enter key to trigger calculation
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateRealTime();
+            }
+        });
+    </script>
+</body>
+</html>
